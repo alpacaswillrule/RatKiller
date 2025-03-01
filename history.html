@@ -10,10 +10,10 @@
     .history-container {
       max-width: 1000px;
       margin: 20px auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      background-color: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     
     .history-header {
@@ -22,12 +22,15 @@
     }
     
     .history-header h2 {
-      color: #333;
-      margin-bottom: 10px;
+      color: var(--dark-blue);
+      margin-bottom: 15px;
+      font-size: 28px;
     }
     
     .history-header p {
-      color: #666;
+      color: var(--dark-gray);
+      font-size: 16px;
+      line-height: 1.5;
     }
     
     .photo-gallery {
@@ -38,16 +41,16 @@
     }
     
     .photo-card {
-      background-color: white;
-      border-radius: 8px;
+      background-color: var(--white);
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all var(--transition-speed);
     }
     
     .photo-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform: translateY(-8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
     
     .photo-image {
@@ -69,7 +72,8 @@
     
     .photo-elo {
       font-weight: bold;
-      color: #4a83ff;
+      color: var(--medium-blue);
+      font-size: 16px;
     }
     
     .no-photos {
@@ -88,11 +92,16 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding: 10px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+      padding: 15px 20px;
+      background-color: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform var(--transition-speed);
+    }
+    
+    .filter-controls:hover {
+      transform: translateY(-3px);
     }
     
     .filter-group {
@@ -106,17 +115,38 @@
     }
     
     .filter-group select {
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 10px 15px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all var(--transition-speed);
+      cursor: pointer;
+    }
+    
+    .filter-group select:focus {
+      outline: none;
+      border-color: var(--medium-blue);
+      box-shadow: 0 0 0 2px rgba(74, 131, 255, 0.2);
     }
     
     .stats-card {
-      background-color: white;
-      border-radius: 8px;
-      padding: 15px;
+      background-color: var(--white);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform var(--transition-speed);
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stats-card h3 {
+      color: var(--dark-blue);
+      margin-top: 0;
       margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 20px;
     }
     
     .stats-grid {
@@ -131,35 +161,48 @@
     }
     
     .stat-value {
-      font-size: 24px;
+      font-size: 32px;
       font-weight: bold;
-      color: #4a83ff;
-      margin-bottom: 5px;
+      color: var(--medium-blue);
+      margin-bottom: 8px;
     }
     
     .stat-label {
       font-size: 14px;
-      color: #666;
+      color: var(--dark-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .create-folder-btn {
-      background-color: #4a83ff;
+      background-color: var(--medium-blue);
       color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
+      padding: 12px 20px;
+      border-radius: 50px;
       cursor: pointer;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       display: inline-flex;
       align-items: center;
+      font-weight: 600;
+      transition: all var(--transition-speed);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     .create-folder-btn i {
-      margin-right: 5px;
+      margin-right: 8px;
+      font-size: 16px;
     }
     
     .create-folder-btn:hover {
       background-color: #3a73ef;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .create-folder-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -375,7 +418,12 @@
   </script>
     
   <footer>
-    <p>Rat Killer <a href="mailto:ondrasek_hanna@wheatoncollege.edu">ondrasek_hanna@wheatoncollege.edu</a></p>
+    <p>Rat Killer</p>
+    <div class="footer-links">
+      <a href="https://www.boston.gov/" class="footer-button" target="_blank">Boston.gov</a>
+      <a href="https://www.boston.gov/departments/inspectional-services/boston-rodent-action-plan" class="footer-button" target="_blank">Rodent Action Plan</a>
+      <a href="https://www.nrdc.org/stories/composting-101" class="footer-button" target="_blank">Composting 101</a>
+    </div>
   </footer>
 </body>
 </html>

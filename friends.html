@@ -10,10 +10,10 @@
     .friends-container {
       max-width: 1000px;
       margin: 20px auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      background-color: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     
     .friends-header {
@@ -22,20 +22,28 @@
     }
     
     .friends-header h2 {
-      color: #333;
-      margin-bottom: 10px;
+      color: var(--dark-blue);
+      margin-bottom: 15px;
+      font-size: 28px;
     }
     
     .friends-header p {
-      color: #666;
+      color: var(--dark-gray);
+      font-size: 16px;
+      line-height: 1.5;
     }
     
     .add-friend-section {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background-color: var(--white);
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform var(--transition-speed);
+    }
+    
+    .add-friend-section:hover {
+      transform: translateY(-5px);
     }
     
     .add-friend-form {
@@ -45,22 +53,40 @@
     
     .add-friend-form input {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 12px 15px;
+      border: 1px solid var(--gray);
+      border-radius: 50px;
+      transition: all var(--transition-speed);
+      font-size: 14px;
+    }
+    
+    .add-friend-form input:focus {
+      outline: none;
+      border-color: var(--medium-blue);
+      box-shadow: 0 0 0 2px rgba(74, 131, 255, 0.2);
     }
     
     .add-friend-form button {
-      background-color: #4a83ff;
+      background-color: var(--medium-blue);
       color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
+      padding: 12px 20px;
+      border-radius: 50px;
       cursor: pointer;
+      font-weight: 600;
+      transition: all var(--transition-speed);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     .add-friend-form button:hover {
       background-color: #3a73ef;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .add-friend-form button:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .friends-list {
@@ -70,17 +96,17 @@
     .friend-card {
       display: flex;
       align-items: center;
-      background-color: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all var(--transition-speed);
     }
     
     .friend-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
     
     .friend-avatar {
@@ -135,7 +161,7 @@
     
     .friend-stat i {
       margin-right: 5px;
-      color: #4a83ff;
+      color: var(--medium-blue);
     }
     
     .friend-actions {
@@ -146,15 +172,25 @@
     .friend-action-btn {
       background-color: transparent;
       border: none;
-      color: #4a83ff;
+      color: var(--medium-blue);
       cursor: pointer;
-      padding: 5px;
-      border-radius: 4px;
-      transition: background-color 0.2s;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all var(--transition-speed);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .friend-action-btn:hover {
-      background-color: #f0f0f0;
+      background-color: var(--light-blue);
+      transform: translateY(-2px);
+    }
+    
+    .friend-action-btn:active {
+      transform: translateY(1px);
     }
     
     .friend-rank {
@@ -172,15 +208,21 @@
     
     .friend-elo {
       font-weight: bold;
-      color: #4a83ff;
+      color: var(--medium-blue);
+      font-size: 16px;
     }
     
     .leaderboard-section {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
+      background-color: var(--white);
+      padding: 25px;
+      border-radius: 12px;
       margin-top: 30px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform var(--transition-speed);
+    }
+    
+    .leaderboard-section:hover {
+      transform: translateY(-5px);
     }
     
     .leaderboard-header {
@@ -191,9 +233,9 @@
     }
     
     .leaderboard-title {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
-      color: #333;
+      color: var(--dark-blue);
     }
     
     .leaderboard-filter {
@@ -206,9 +248,17 @@
     }
     
     .leaderboard-filter select {
-      padding: 5px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 8px 12px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      transition: all var(--transition-speed);
+      font-size: 14px;
+    }
+    
+    .leaderboard-filter select:focus {
+      outline: none;
+      border-color: var(--medium-blue);
+      box-shadow: 0 0 0 2px rgba(74, 131, 255, 0.2);
     }
     
     .leaderboard-table {
@@ -266,7 +316,7 @@
     }
     
     .highlight-row {
-      background-color: #e3f2fd !important;
+      background-color: var(--light-blue) !important;
     }
     
     .no-friends {
@@ -283,29 +333,43 @@
     
     .tabs {
       display: flex;
-      margin-bottom: 20px;
-      background-color: white;
-      border-radius: 8px;
+      margin-bottom: 25px;
+      background-color: var(--white);
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     
     .tab {
       flex: 1;
-      padding: 15px;
+      padding: 18px;
       text-align: center;
       cursor: pointer;
-      transition: background-color 0.3s;
-      font-weight: bold;
+      transition: all var(--transition-speed);
+      font-weight: 600;
+      position: relative;
     }
     
     .tab.active {
-      background-color: #4a83ff;
+      background-color: var(--medium-blue);
       color: white;
     }
     
     .tab:hover:not(.active) {
-      background-color: #f0f0f0;
+      background-color: var(--light-blue);
+    }
+    
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid var(--white);
     }
     
     .tab-content {
@@ -808,7 +872,12 @@
   </script>
     
   <footer>
-    <p>Rat Killer <a href="mailto:ondrasek_hanna@wheatoncollege.edu">ondrasek_hanna@wheatoncollege.edu</a></p>
+    <p>Rat Killer</p>
+    <div class="footer-links">
+      <a href="https://www.boston.gov/" class="footer-button" target="_blank">Boston.gov</a>
+      <a href="https://www.boston.gov/departments/inspectional-services/boston-rodent-action-plan" class="footer-button" target="_blank">Rodent Action Plan</a>
+      <a href="https://www.nrdc.org/stories/composting-101" class="footer-button" target="_blank">Composting 101</a>
+    </div>
   </footer>
 </body>
 </html>
