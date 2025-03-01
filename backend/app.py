@@ -32,6 +32,16 @@ os.makedirs(app.config['PHOTOS_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
+    """Serve the main index.html file."""
+    return send_from_directory('../', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files."""
+    return send_from_directory('../', path)
+
+@app.route('/api')
+def api_index():
     """API root endpoint."""
     return jsonify({
         'name': 'Rat Reporter API',
