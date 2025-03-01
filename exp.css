@@ -1,0 +1,297 @@
+body {margin:0;font-family: 'Georgia, 'Times New Roman', Times, serif'}
+* {
+  box-sizing: border-box;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* header img */
+.headerimg {
+  max-width: 70%;
+  height: auto;
+  
+  
+}
+
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: #252323;
+  text-align: center;
+  padding: 24px 26px;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: thin;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Add an active class to highlight the current page */
+.active {
+  background-color: #ffffff;
+  color: white;
+}
+
+/* Hide the link that should open and close the topnav on small screens */
+.topnav .icon {
+  display: none;
+}
+
+/* Dropdown container - needed to position the dropdown content */
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+/* Style the dropdown button to fit inside the topnav */
+.dropdown .dropbtn {
+  font-size: 17px;
+  border: none;
+  outline: none;
+  color: rgb(42, 46, 42);
+  padding: 24px 26px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Style the dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Style the links inside the dropdown */
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 16px 18px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+/* Add a dark background on topnav links and the dropdown button on hover */
+.topnav a:hover, .dropdown:hover .dropbtn {
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+}
+
+/* Add a grey background to dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+  color: black;
+}
+ 
+/* Show the dropdown menu when the user moves the mouse over the dropdown button */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 600px) {
+  .topnav a:not(:first-child), .dropdown .dropbtn {
+    display: none;
+  }
+  .topnav a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+/* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
+@media screen and (max-width: 600px) {
+  .topnav.responsive {position: relative;}
+  .topnav.responsive a.icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .topnav.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .topnav.responsive .dropdown {float: none;}
+  .topnav.responsive .dropdown-content {position: relative;}
+  .topnav.responsive .dropdown .dropbtn {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+}
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .row::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  [class*="col-"] {
+    float: left;
+    padding: 15px;
+  }
+  
+  html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  
+  
+  
+  
+  .header2 {
+    text-decoration: none;
+    font-size: 20px;
+    background-color: #f3ad2b;
+    color: #ffffff;
+    padding: 15px;
+  }
+
+  .header2 h1 {
+    font-weight: 200;
+  }
+
+  .menu p {
+    text-align: center;
+  }
+  .menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  .btlink {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+  .menu li {
+    padding: 15px;
+    margin-bottom: 7px;
+    font-weight: 500;
+    
+    background-color: #4a83ff;
+    color: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    text-align: center;
+  }
+  
+  
+
+  .aside {
+    background-color: #33b5e5;
+    padding: 15px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+
+  .aside h1 {
+    font-weight: 200;
+  }
+
+  .aside h2 {
+    font-weight: 400;
+  }
+
+
+  .listitems {
+    font-size: 17px;
+    padding: 7px;
+  }
+
+
+  /* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+  .col-s-1 {width: 8.33%;}
+  .col-s-2 {width: 16.66%;}
+  .col-s-3 {width: 25%;}
+  .col-s-4 {width: 33.33%;}
+  .col-s-5 {width: 41.66%;}
+  .col-s-6 {width: 50%;}
+  .col-s-7 {width: 58.33%;}
+  .col-s-8 {width: 66.66%;}
+  .col-s-9 {width: 75%;}
+  .col-s-10 {width: 83.33%;}
+  .col-s-11 {width: 91.66%;}
+  .col-s-12 {width: 100%;}
+}
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+  
+  .fa-instagram {
+    padding: 15px;
+    font-size: 20px;
+    width: 45px;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px 2px;
+    background: #125688;
+    color: white;
+  }
+
+  .fa-twitter {
+    padding: 15px;
+    font-size: 20px;
+    width: 45px;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px 2px;
+    background: #55ACEE;
+    color: white;
+}
+  
+  .fa:hover {
+      opacity: 0.7;
+  }   
+  
+    footer {
+      clear: both;
+      font-size: 15px;
+      text-align: center;
+      text-decoration: none;
+      padding: 3px;
+      background-color: DarkSalmon;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
