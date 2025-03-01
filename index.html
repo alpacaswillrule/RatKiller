@@ -9,7 +9,7 @@
 
 <body>
   <div class="header">
-    <p>rat reporter</p>
+    <h1 class="app-title">Rat Reporter</h1>
   </div>
   <div class="topnav" id="myTopnav">
     <a href="index.html" class="active">Home</a> 
@@ -20,7 +20,7 @@
   </div>
 
   <div class="header2">
-    <h1>rat reporter</h1>
+    <h1>Rat Reporter</h1>
   </div>
 
   <div class="row">
@@ -77,6 +77,12 @@
   </div>
 
   <script>
+    // API URL - change this to your backend URL when deployed
+    const API_URL = 'http://localhost:5000/api';
+    
+    // Current user ID (in a real app, this would come from authentication)
+    const CURRENT_USER_ID = 1;
+    
     // Navigation function
     function myFunction() {
       var x = document.getElementById("myTopnav");
@@ -87,8 +93,29 @@
       }
     }
 
-    // Calculate time until next Tuesday 1 PM
-    function updateGarbageTimer() {
+    // Fetch garbage time from API
+    async function updateGarbageTimer() {
+      try {
+        const response = await fetch(`${API_URL}/garbage-time`);
+        const data = await response.json();
+        
+        const hours = Math.floor(data.hours_until_pickup);
+        const minutes = Math.round((data.hours_until_pickup - hours) * 60);
+        
+        document.getElementById('hours-remaining').textContent = 
+          `${hours} hours, ${minutes} minutes`;
+          
+        // Store for later use
+        window.hoursUntilPickup = data.hours_until_pickup;
+      } catch (error) {
+        console.error('Error fetching garbage time:', error);
+        // Fallback to client-side calculation if API fails
+        calculateGarbageTimeLocally();
+      }
+    }
+    
+    // Fallback function for calculating garbage time locally
+    function calculateGarbageTimeLocally() {
       const now = new Date();
       let nextTuesday = new Date();
       
@@ -110,12 +137,45 @@
       
       document.getElementById('hours-remaining').textContent = 
         `${diffHrs} hours, ${diffMins} minutes`;
+        
+      // Store for later use
+      window.hoursUntilPickup = diffHrs + (diffMins / 60);
     }
 
     // Initialize garbage timer
     updateGarbageTimer();
     // Update every minute
     setInterval(updateGarbageTimer, 60000);
+
+    // Fetch user data from API
+    async function loadUserData() {
+      try {
+        const response = await fetch(`${API_URL}/user/${CURRENT_USER_ID}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        
+        const userData = await response.json();
+        
+        // Update UI with user data
+        document.getElementById('elo-value').textContent = userData.elo_rating;
+        document.getElementById('rats-count').textContent = userData.disposals_count;
+        
+        // Update rank icon
+        updateRankIcon(userData.elo_rating);
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // Fallback to localStorage if API fails
+        loadUserDataFromLocalStorage();
+      }
+    }
+    
+    // Fallback function for loading user data from localStorage
+    function loadUserDataFromLocalStorage() {
+      const savedElo = localStorage.getItem('userElo') || '1200';
+      document.getElementById('elo-value').textContent = savedElo;
+      updateRankIcon(parseInt(savedElo));
+    }
 
     // Chat popup functionality
     document.getElementById('chat-popup').addEventListener('click', function() {
@@ -130,6 +190,7 @@
     const saveButton = document.getElementById('photo-save');
     const closeButton = document.querySelector('.close-button');
     let stream = null;
+    let capturedPhoto = null;
 
     // Open camera modal
     document.getElementById('garbage-button').addEventListener('click', function() {
@@ -168,19 +229,82 @@
       cameraCanvas.width = cameraView.videoWidth;
       cameraCanvas.height = cameraView.videoHeight;
       context.drawImage(cameraView, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      capturedPhoto = cameraCanvas.toDataURL('image/png');
       saveButton.disabled = false;
     });
 
     // Save photo
-    saveButton.addEventListener('click', function() {
-      const photoData = cameraCanvas.toDataURL('image/png');
+    saveButton.addEventListener('click', async function() {
+      if (!capturedPhoto) return;
       
+      try {
+        // First, calculate potential ELO gain
+        const eloResponse = await fetch(`${API_URL}/photos/elo`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            hours_until_pickup: window.hoursUntilPickup || 24
+          })
+        });
+        
+        const eloData = await eloResponse.json();
+        
+        // Upload photo to API
+        const uploadResponse = await fetch(`${API_URL}/photos/upload`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: CURRENT_USER_ID,
+            photo: capturedPhoto
+          })
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload photo');
+        }
+        
+        const photoData = await uploadResponse.json();
+        
+        // Update user's ELO
+        await fetch(`${API_URL}/user/${CURRENT_USER_ID}/elo`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            elo_change: eloData.elo_gain
+          })
+        });
+        
+        // Reload user data to update UI
+        await loadUserData();
+        
+        // Close modal
+        cameraModal.style.display = 'none';
+        stopCamera();
+        
+        // Show success message
+        alert(`Photo saved! ${eloData.message} You gained ${eloData.elo_gain} ELO points.`);
+      } catch (error) {
+        console.error('Error saving photo:', error);
+        
+        // Fallback to localStorage if API fails
+        savePhotoToLocalStorage();
+      }
+    });
+    
+    // Fallback function for saving photo to localStorage
+    function savePhotoToLocalStorage() {
       // Save to local storage
       const timestamp = new Date().toISOString();
       const photos = JSON.parse(localStorage.getItem('garbagePhotos') || '[]');
       photos.push({
         id: Date.now(),
-        data: photoData,
+        data: capturedPhoto,
         timestamp: timestamp
       });
       localStorage.setItem('garbagePhotos', JSON.stringify(photos));
@@ -193,20 +317,15 @@
       stopCamera();
       
       alert('Photo saved! Check the History tab to view it.');
-    });
+    }
 
-    // ELO calculation based on garbage timing
+    // ELO calculation based on garbage timing (fallback function)
     function updateEloForGarbageDisposal() {
       // Get current ELO
       let currentElo = parseInt(document.getElementById('elo-value').textContent);
       
       // Calculate bonus based on timing
-      const now = new Date();
-      let nextTuesday = new Date();
-      nextTuesday.setDate(now.getDate() + ((9 - now.getDay()) % 7));
-      nextTuesday.setHours(13, 0, 0, 0);
-      
-      const hoursUntilPickup = (nextTuesday - now) / (1000 * 60 * 60);
+      const hoursUntilPickup = window.hoursUntilPickup || 24;
       
       // More points for putting garbage out closer to pickup time
       let eloBonus = 0;
@@ -252,13 +371,9 @@
       document.getElementById('rank-icon').src = 'rank_icons/' + rankIcon;
     }
 
-    // Load saved ELO on page load
+    // Load user data on page load
     window.addEventListener('load', function() {
-      const savedElo = localStorage.getItem('userElo');
-      if (savedElo) {
-        document.getElementById('elo-value').textContent = savedElo;
-        updateRankIcon(parseInt(savedElo));
-      }
+      loadUserData();
     });
   </script>
     

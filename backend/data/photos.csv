@@ -1,0 +1,6 @@
+id,user_id,timestamp,photo_path,elo_gained
+1,1,2025-02-28T10:15:30Z,photos/user1_1.jpg,25
+2,1,2025-02-29T14:22:45Z,photos/user1_2.jpg,30
+3,2,2025-02-27T09:05:12Z,photos/user2_1.jpg,15
+4,2,2025-02-28T16:40:22Z,photos/user2_2.jpg,40
+5,3,2025-02-29T11:30:00Z,photos/user3_1.jpg,20

@@ -1,0 +1,4 @@
+id,user_id,friend_id,status,created_at
+1,1,2,accepted,2025-02-15T10:20:30Z
+2,1,3,accepted,2025-02-16T14:35:22Z
+3,2,3,pending,2025-02-28T09:45:10Z

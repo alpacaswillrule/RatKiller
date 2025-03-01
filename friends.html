@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>rat reporter - Friends</title>
+  <title>Rat Reporter - Friends</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -39,11 +39,6 @@
       border-radius: 12px;
       margin-bottom: 25px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: transform var(--transition-speed);
-    }
-    
-    .add-friend-section:hover {
-      transform: translateY(-5px);
     }
     
     .add-friend-form {
@@ -56,14 +51,6 @@
       padding: 12px 15px;
       border: 1px solid var(--gray);
       border-radius: 50px;
-      transition: all var(--transition-speed);
-      font-size: 14px;
-    }
-    
-    .add-friend-form input:focus {
-      outline: none;
-      border-color: var(--medium-blue);
-      box-shadow: 0 0 0 2px rgba(74, 131, 255, 0.2);
     }
     
     .add-friend-form button {
@@ -74,19 +61,6 @@
       border-radius: 50px;
       cursor: pointer;
       font-weight: 600;
-      transition: all var(--transition-speed);
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    .add-friend-form button:hover {
-      background-color: #3a73ef;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-    
-    .add-friend-form button:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .friends-list {
@@ -101,12 +75,6 @@
       border-radius: 12px;
       margin-bottom: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: all var(--transition-speed);
-    }
-    
-    .friend-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
     
     .friend-avatar {
@@ -118,13 +86,6 @@
       align-items: center;
       justify-content: center;
       margin-right: 15px;
-      overflow: hidden;
-    }
-    
-    .friend-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
     
     .friend-avatar i {
@@ -176,21 +137,11 @@
       cursor: pointer;
       padding: 8px;
       border-radius: 50%;
-      transition: all var(--transition-speed);
       width: 36px;
       height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    .friend-action-btn:hover {
-      background-color: var(--light-blue);
-      transform: translateY(-2px);
-    }
-    
-    .friend-action-btn:active {
-      transform: translateY(1px);
     }
     
     .friend-rank {
@@ -218,11 +169,6 @@
       border-radius: 12px;
       margin-top: 30px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: transform var(--transition-speed);
-    }
-    
-    .leaderboard-section:hover {
-      transform: translateY(-5px);
     }
     
     .leaderboard-header {
@@ -251,14 +197,6 @@
       padding: 8px 12px;
       border: 1px solid var(--gray);
       border-radius: 8px;
-      transition: all var(--transition-speed);
-      font-size: 14px;
-    }
-    
-    .leaderboard-filter select:focus {
-      outline: none;
-      border-color: var(--medium-blue);
-      box-shadow: 0 0 0 2px rgba(74, 131, 255, 0.2);
     }
     
     .leaderboard-table {
@@ -277,10 +215,6 @@
       background-color: #f9f9f9;
       font-weight: bold;
       color: #333;
-    }
-    
-    .leaderboard-table tr:hover {
-      background-color: #f5f5f5;
     }
     
     .leaderboard-rank {
@@ -302,13 +236,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
     
-    .leaderboard-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .leaderboard-avatar i {
+      font-size: 16px;
+      color: #999;
     }
     
     .leaderboard-name {
@@ -345,7 +277,6 @@
       padding: 18px;
       text-align: center;
       cursor: pointer;
-      transition: all var(--transition-speed);
       font-weight: 600;
       position: relative;
     }
@@ -353,23 +284,6 @@
     .tab.active {
       background-color: var(--medium-blue);
       color: white;
-    }
-    
-    .tab:hover:not(.active) {
-      background-color: var(--light-blue);
-    }
-    
-    .tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 10px solid var(--white);
     }
     
     .tab-content {
@@ -384,7 +298,7 @@
 
 <body>
   <div class="header">
-    <p>rat reporter</p>
+    <h1 class="app-title">Rat Reporter</h1>
   </div>
   <div class="topnav" id="myTopnav">
     <a href="index.html">Home</a> 
@@ -421,12 +335,71 @@
       
       <div class="friends-list" id="friends-list">
         <!-- Friends will be dynamically added here -->
-      </div>
-      
-      <div id="no-friends" class="no-friends">
-        <i class="fa fa-users"></i>
-        <h3>No Friends Yet</h3>
-        <p>Add friends to see their garbage disposal activities and compare stats.</p>
+        <div class="friend-card">
+          <div class="friend-avatar">
+            <i class="fa fa-user"></i>
+          </div>
+          <div class="friend-info">
+            <div class="friend-name">Jane Smith</div>
+            <div class="friend-status">Last active: Today, 2:30 PM</div>
+            <div class="friend-stats">
+              <div class="friend-stat">
+                <i class="fa fa-trash"></i> 24 disposals
+              </div>
+              <div class="friend-stat">
+                <i class="fa fa-clock-o"></i> 1.5 hrs best timing
+              </div>
+            </div>
+          </div>
+          <div class="friend-rank">
+            <img src="rank_icons/Season_2023_-_Platinum.png" alt="Rank">
+            <div class="friend-elo">1850</div>
+          </div>
+          <div class="friend-actions">
+            <button class="friend-action-btn" title="View Profile">
+              <i class="fa fa-user"></i>
+            </button>
+            <button class="friend-action-btn" title="Send Message">
+              <i class="fa fa-comment"></i>
+            </button>
+            <button class="friend-action-btn" title="Remove Friend">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="friend-card">
+          <div class="friend-avatar">
+            <i class="fa fa-user"></i>
+          </div>
+          <div class="friend-info">
+            <div class="friend-name">John Doe</div>
+            <div class="friend-status">Last active: Yesterday</div>
+            <div class="friend-stats">
+              <div class="friend-stat">
+                <i class="fa fa-trash"></i> 42 disposals
+              </div>
+              <div class="friend-stat">
+                <i class="fa fa-clock-o"></i> 0.8 hrs best timing
+              </div>
+            </div>
+          </div>
+          <div class="friend-rank">
+            <img src="rank_icons/Season_2023_-_Emerald.png" alt="Rank">
+            <div class="friend-elo">2250</div>
+          </div>
+          <div class="friend-actions">
+            <button class="friend-action-btn" title="View Profile">
+              <i class="fa fa-user"></i>
+            </button>
+            <button class="friend-action-btn" title="Send Message">
+              <i class="fa fa-comment"></i>
+            </button>
+            <button class="friend-action-btn" title="Remove Friend">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -455,7 +428,34 @@
             </tr>
           </thead>
           <tbody id="leaderboard-body">
-            <!-- Leaderboard entries will be dynamically added here -->
+            <tr>
+              <td class="leaderboard-rank">1</td>
+              <td>
+                <div class="leaderboard-user">
+                  <div class="leaderboard-avatar">
+                    <i class="fa fa-user"></i>
+                  </div>
+                  <div class="leaderboard-name">John Doe</div>
+                </div>
+              </td>
+              <td>2250</td>
+              <td>42</td>
+              <td>0.8 hrs</td>
+            </tr>
+            <tr class="highlight-row">
+              <td class="leaderboard-rank">2</td>
+              <td>
+                <div class="leaderboard-user">
+                  <div class="leaderboard-avatar">
+                    <i class="fa fa-user"></i>
+                  </div>
+                  <div class="leaderboard-name">Current User (You)</div>
+                </div>
+              </td>
+              <td>1700</td>
+              <td>20</td>
+              <td>2.1 hrs</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -463,13 +463,23 @@
     
     <div id="requests-tab" class="tab-content">
       <div class="friends-list" id="friend-requests-list">
-        <!-- Friend requests will be dynamically added here -->
-      </div>
-      
-      <div id="no-requests" class="no-friends">
-        <i class="fa fa-envelope-o"></i>
-        <h3>No Friend Requests</h3>
-        <p>You don't have any pending friend requests at the moment.</p>
+        <div class="friend-card">
+          <div class="friend-avatar">
+            <i class="fa fa-user"></i>
+          </div>
+          <div class="friend-info">
+            <div class="friend-name">Robert Wilson</div>
+            <div class="friend-status">Sent request 2 days ago</div>
+          </div>
+          <div class="friend-actions">
+            <button class="friend-action-btn" title="Accept">
+              <i class="fa fa-check"></i>
+            </button>
+            <button class="friend-action-btn" title="Reject">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -500,377 +510,8 @@
         document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
       });
     });
-    
-    // Sample data for friends
-    const sampleFriends = [
-      {
-        id: 1,
-        name: 'Jane Smith',
-        avatar: null,
-        status: 'Last active: Today, 2:30 PM',
-        elo: 1850,
-        rank: 'Season_2023_-_Platinum.png',
-        disposals: 24,
-        bestTiming: 1.5
-      },
-      {
-        id: 2,
-        name: 'John Doe',
-        avatar: null,
-        status: 'Last active: Yesterday',
-        elo: 2250,
-        rank: 'Season_2023_-_Emerald.png',
-        disposals: 42,
-        bestTiming: 0.8
-      },
-      {
-        id: 3,
-        name: 'Alice Johnson',
-        avatar: null,
-        status: 'Last active: 3 days ago',
-        elo: 1350,
-        rank: 'Season_2023_-_Gold.png',
-        disposals: 15,
-        bestTiming: 3.2
-      }
-    ];
-    
-    // Sample data for leaderboard
-    const sampleLeaderboard = [
-      {
-        rank: 1,
-        name: 'John Doe',
-        avatar: null,
-        elo: 2250,
-        disposals: 42,
-        bestTiming: 0.8,
-        isCurrentUser: false
-      },
-      {
-        rank: 2,
-        name: 'Sarah Williams',
-        avatar: null,
-        elo: 2100,
-        disposals: 38,
-        bestTiming: 1.2,
-        isCurrentUser: false
-      },
-      {
-        rank: 3,
-        name: 'Michael Brown',
-        avatar: null,
-        elo: 1950,
-        disposals: 35,
-        bestTiming: 1.4,
-        isCurrentUser: false
-      },
-      {
-        rank: 4,
-        name: 'Jane Smith',
-        avatar: null,
-        elo: 1850,
-        disposals: 24,
-        bestTiming: 1.5,
-        isCurrentUser: false
-      },
-      {
-        rank: 5,
-        name: 'Current User',
-        avatar: null,
-        elo: 1700,
-        disposals: 20,
-        bestTiming: 2.1,
-        isCurrentUser: true
-      },
-      {
-        rank: 6,
-        name: 'Alice Johnson',
-        avatar: null,
-        elo: 1350,
-        disposals: 15,
-        bestTiming: 3.2,
-        isCurrentUser: false
-      }
-    ];
-    
-    // Sample data for friend requests
-    const sampleRequests = [
-      {
-        id: 101,
-        name: 'Robert Wilson',
-        avatar: null,
-        status: 'Sent request 2 days ago'
-      },
-      {
-        id: 102,
-        name: 'Emily Davis',
-        avatar: null,
-        status: 'Sent request yesterday'
-      }
-    ];
-    
-    // Load friends
-    function loadFriends() {
-      const friendsList = document.getElementById('friends-list');
-      const noFriendsMessage = document.getElementById('no-friends');
-      
-      // Get friends from local storage or use sample data
-      const friends = JSON.parse(localStorage.getItem('friends')) || sampleFriends;
-      
-      // Clear list
-      friendsList.innerHTML = '';
-      
-      // Show/hide no friends message
-      if (friends.length === 0) {
-        noFriendsMessage.style.display = 'block';
-        return;
-      } else {
-        noFriendsMessage.style.display = 'none';
-      }
-      
-      // Display friends
-      friends.forEach(friend => {
-        const friendCard = document.createElement('div');
-        friendCard.className = 'friend-card';
-        
-        friendCard.innerHTML = `
-          <div class="friend-avatar">
-            ${friend.avatar ? `<img src="${friend.avatar}" alt="${friend.name}">` : '<i class="fa fa-user"></i>'}
-          </div>
-          <div class="friend-info">
-            <div class="friend-name">${friend.name}</div>
-            <div class="friend-status">${friend.status}</div>
-            <div class="friend-stats">
-              <div class="friend-stat">
-                <i class="fa fa-trash"></i> ${friend.disposals} disposals
-              </div>
-              <div class="friend-stat">
-                <i class="fa fa-clock-o"></i> ${friend.bestTiming} hrs best timing
-              </div>
-            </div>
-          </div>
-          <div class="friend-rank">
-            <img src="rank_icons/${friend.rank}" alt="Rank">
-            <div class="friend-elo">${friend.elo}</div>
-          </div>
-          <div class="friend-actions">
-            <button class="friend-action-btn" title="View Profile">
-              <i class="fa fa-user"></i>
-            </button>
-            <button class="friend-action-btn" title="Send Message">
-              <i class="fa fa-comment"></i>
-            </button>
-            <button class="friend-action-btn remove-friend" data-id="${friend.id}" title="Remove Friend">
-              <i class="fa fa-times"></i>
-            </button>
-          </div>
-        `;
-        
-        friendsList.appendChild(friendCard);
-      });
-      
-      // Add event listeners for remove buttons
-      document.querySelectorAll('.remove-friend').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const friendId = parseInt(this.dataset.id);
-          removeFriend(friendId);
-        });
-      });
-    }
-    
-    // Remove friend
-    function removeFriend(friendId) {
-      if (confirm('Are you sure you want to remove this friend?')) {
-        let friends = JSON.parse(localStorage.getItem('friends')) || sampleFriends;
-        friends = friends.filter(friend => friend.id !== friendId);
-        localStorage.setItem('friends', JSON.stringify(friends));
-        loadFriends();
-      }
-    }
-    
-    // Load leaderboard
-    function loadLeaderboard() {
-      const leaderboardBody = document.getElementById('leaderboard-body');
-      
-      // Get leaderboard data from local storage or use sample data
-      const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || sampleLeaderboard;
-      
-      // Clear table
-      leaderboardBody.innerHTML = '';
-      
-      // Display leaderboard entries
-      leaderboard.forEach(entry => {
-        const row = document.createElement('tr');
-        if (entry.isCurrentUser) {
-          row.className = 'highlight-row';
-        }
-        
-        row.innerHTML = `
-          <td class="leaderboard-rank">${entry.rank}</td>
-          <td>
-            <div class="leaderboard-user">
-              <div class="leaderboard-avatar">
-                ${entry.avatar ? `<img src="${entry.avatar}" alt="${entry.name}">` : '<i class="fa fa-user"></i>'}
-              </div>
-              <div class="leaderboard-name">${entry.name}${entry.isCurrentUser ? ' (You)' : ''}</div>
-            </div>
-          </td>
-          <td>${entry.elo}</td>
-          <td>${entry.disposals}</td>
-          <td>${entry.bestTiming} hrs</td>
-        `;
-        
-        leaderboardBody.appendChild(row);
-      });
-    }
-    
-    // Load friend requests
-    function loadFriendRequests() {
-      const requestsList = document.getElementById('friend-requests-list');
-      const noRequestsMessage = document.getElementById('no-requests');
-      
-      // Get requests from local storage or use sample data
-      const requests = JSON.parse(localStorage.getItem('friendRequests')) || sampleRequests;
-      
-      // Clear list
-      requestsList.innerHTML = '';
-      
-      // Show/hide no requests message
-      if (requests.length === 0) {
-        noRequestsMessage.style.display = 'block';
-        return;
-      } else {
-        noRequestsMessage.style.display = 'none';
-      }
-      
-      // Display requests
-      requests.forEach(request => {
-        const requestCard = document.createElement('div');
-        requestCard.className = 'friend-card';
-        
-        requestCard.innerHTML = `
-          <div class="friend-avatar">
-            ${request.avatar ? `<img src="${request.avatar}" alt="${request.name}">` : '<i class="fa fa-user"></i>'}
-          </div>
-          <div class="friend-info">
-            <div class="friend-name">${request.name}</div>
-            <div class="friend-status">${request.status}</div>
-          </div>
-          <div class="friend-actions">
-            <button class="friend-action-btn accept-request" data-id="${request.id}" title="Accept">
-              <i class="fa fa-check"></i>
-            </button>
-            <button class="friend-action-btn reject-request" data-id="${request.id}" title="Reject">
-              <i class="fa fa-times"></i>
-            </button>
-          </div>
-        `;
-        
-        requestsList.appendChild(requestCard);
-      });
-      
-      // Add event listeners for accept/reject buttons
-      document.querySelectorAll('.accept-request').forEach(button => {
-        button.addEventListener('click', function() {
-          const requestId = parseInt(this.dataset.id);
-          acceptFriendRequest(requestId);
-        });
-      });
-      
-      document.querySelectorAll('.reject-request').forEach(button => {
-        button.addEventListener('click', function() {
-          const requestId = parseInt(this.dataset.id);
-          rejectFriendRequest(requestId);
-        });
-      });
-    }
-    
-    // Accept friend request
-    function acceptFriendRequest(requestId) {
-      let requests = JSON.parse(localStorage.getItem('friendRequests')) || sampleRequests;
-      const request = requests.find(req => req.id === requestId);
-      
-      if (request) {
-        // Add to friends
-        const friends = JSON.parse(localStorage.getItem('friends')) || sampleFriends;
-        friends.push({
-          id: request.id,
-          name: request.name,
-          avatar: request.avatar,
-          status: 'Last active: Just now',
-          elo: Math.floor(Math.random() * 1000) + 1000,
-          rank: 'Season_2023_-_Silver.png',
-          disposals: Math.floor(Math.random() * 20) + 5,
-          bestTiming: (Math.random() * 5).toFixed(1)
-        });
-        localStorage.setItem('friends', JSON.stringify(friends));
-        
-        // Remove from requests
-        requests = requests.filter(req => req.id !== requestId);
-        localStorage.setItem('friendRequests', JSON.stringify(requests));
-        
-        // Reload lists
-        loadFriends();
-        loadFriendRequests();
-      }
-    }
-    
-    // Reject friend request
-    function rejectFriendRequest(requestId) {
-      let requests = JSON.parse(localStorage.getItem('friendRequests')) || sampleRequests;
-      requests = requests.filter(req => req.id !== requestId);
-      localStorage.setItem('friendRequests', JSON.stringify(requests));
-      loadFriendRequests();
-    }
-    
-    // Add friend form submission
-    document.getElementById('add-friend-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const username = document.getElementById('friend-username').value.trim();
-      if (!username) return;
-      
-      // For demo purposes, create a random friend
-      const newFriend = {
-        id: Date.now(),
-        name: username,
-        avatar: null,
-        status: 'Last active: Just now',
-        elo: Math.floor(Math.random() * 1000) + 1000,
-        rank: 'Season_2023_-_Silver.png',
-        disposals: Math.floor(Math.random() * 20) + 5,
-        bestTiming: (Math.random() * 5).toFixed(1)
-      };
-      
-      // Add to friends list
-      const friends = JSON.parse(localStorage.getItem('friends')) || sampleFriends;
-      friends.push(newFriend);
-      localStorage.setItem('friends', JSON.stringify(friends));
-      
-      // Reset form and reload friends
-      document.getElementById('friend-username').value = '';
-      loadFriends();
-      
-      // Show confirmation
-      alert(`Friend request sent to ${username}!`);
-    });
-    
-    // Leaderboard period change
-    document.getElementById('leaderboard-period').addEventListener('change', function() {
-      // In a real app, this would fetch different leaderboard data
-      // For demo, we'll just reload the same data
-      loadLeaderboard();
-    });
-    
-    // Load data when page loads
-    window.addEventListener('load', function() {
-      loadFriends();
-      loadLeaderboard();
-      loadFriendRequests();
-    });
   </script>
-    
+  
   <footer>
     <p>rat reporter</p>
     <div class="footer-links">

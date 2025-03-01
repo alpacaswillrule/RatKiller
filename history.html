@@ -209,7 +209,7 @@
 
 <body>
   <div class="header">
-    <p>rat reporter</p>
+    <h1 class="app-title">Rat Reporter</h1>
   </div>
   <div class="topnav" id="myTopnav">
     <a href="index.html">Home</a> 
@@ -285,6 +285,12 @@
   </div>
 
   <script>
+    // API URL - change this to your backend URL when deployed
+    const API_URL = 'http://localhost:5000/api';
+    
+    // Current user ID (in a real app, this would come from authentication)
+    const CURRENT_USER_ID = 1;
+    
     // Navigation function
     function myFunction() {
       var x = document.getElementById("myTopnav");
@@ -297,11 +303,138 @@
 
     // Create photos folder
     document.getElementById('create-photos-folder').addEventListener('click', function() {
-      alert('In a real application, this would create a folder on your device to store photos. For this demo, photos are stored in your browser\'s local storage.');
+      alert('In a real application, this would create a folder on your device to store photos. Photos are now stored on the server.');
     });
     
     // Load and display photos
-    function loadPhotos() {
+    async function loadPhotos() {
+      const photoGallery = document.getElementById('photo-gallery');
+      const noPhotosMessage = document.getElementById('no-photos');
+      const totalPhotosElement = document.getElementById('total-photos');
+      const totalEloElement = document.getElementById('total-elo');
+      const bestTimingElement = document.getElementById('best-timing');
+      
+      try {
+        // Get user data from API
+        const userResponse = await fetch(`${API_URL}/user/${CURRENT_USER_ID}`);
+        if (!userResponse.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await userResponse.json();
+        
+        // Get photos from API
+        const photosResponse = await fetch(`${API_URL}/photos/user/${CURRENT_USER_ID}`);
+        if (!photosResponse.ok) {
+          throw new Error('Failed to fetch photos');
+        }
+        const photos = await photosResponse.json();
+        
+        // Update stats
+        totalPhotosElement.textContent = photos.length;
+        
+        // Calculate total ELO gained
+        const totalElo = photos.reduce((sum, photo) => sum + photo.elo_gained, 0);
+        totalEloElement.textContent = totalElo;
+        
+        // Get best timing from user data
+        bestTimingElement.textContent = userData.best_timing || 0;
+        
+        // Clear gallery
+        photoGallery.innerHTML = '';
+        
+        // Show/hide no photos message
+        if (photos.length === 0) {
+          noPhotosMessage.style.display = 'block';
+          return;
+        } else {
+          noPhotosMessage.style.display = 'none';
+        }
+        
+        // Sort photos based on selected option
+        const sortBy = document.getElementById('sort-by').value;
+        const sortedPhotos = [...photos];
+        
+        switch (sortBy) {
+          case 'newest':
+            sortedPhotos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            break;
+          case 'oldest':
+            sortedPhotos.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            break;
+          case 'elo-high':
+            sortedPhotos.sort((a, b) => b.elo_gained - a.elo_gained);
+            break;
+          case 'elo-low':
+            sortedPhotos.sort((a, b) => a.elo_gained - b.elo_gained);
+            break;
+        }
+        
+        // Filter photos based on time period
+        const timeFilter = document.getElementById('time-filter').value;
+        let filteredPhotos = sortedPhotos;
+        
+        if (timeFilter !== 'all') {
+          const now = new Date();
+          let cutoffDate;
+          
+          switch (timeFilter) {
+            case 'week':
+              cutoffDate = new Date(now.setDate(now.getDate() - 7));
+              break;
+            case 'month':
+              cutoffDate = new Date(now.setMonth(now.getMonth() - 1));
+              break;
+            case 'year':
+              cutoffDate = new Date(now.setFullYear(now.getFullYear() - 1));
+              break;
+          }
+          
+          filteredPhotos = sortedPhotos.filter(photo => new Date(photo.timestamp) >= cutoffDate);
+        }
+        
+        // Display photos
+        filteredPhotos.forEach(photo => {
+          // Format date
+          const photoDate = new Date(photo.timestamp);
+          const formattedDate = photoDate.toLocaleDateString() + ' ' + 
+                               photoDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          
+          // Create photo card
+          const photoCard = document.createElement('div');
+          photoCard.className = 'photo-card';
+          
+          // Use the photo path from the API or fallback to localStorage
+          const photoSrc = photo.photo_path ? 
+            `${API_URL}/photos/${photo.photo_path.split('/').pop()}` : 
+            (photo.data || 'https://via.placeholder.com/300x200?text=Photo+Not+Found');
+          
+          photoCard.innerHTML = `
+            <img src="${photoSrc}" alt="Garbage photo" class="photo-image">
+            <div class="photo-info">
+              <div class="photo-date">${formattedDate}</div>
+              <div class="photo-elo">+${photo.elo_gained} ELO gained</div>
+            </div>
+          `;
+          
+          photoGallery.appendChild(photoCard);
+        });
+        
+        // If filtered results are empty, show message
+        if (filteredPhotos.length === 0) {
+          noPhotosMessage.style.display = 'block';
+          noPhotosMessage.querySelector('h3').textContent = 'No Photos Found';
+          noPhotosMessage.querySelector('p').textContent = 'No photos match your current filter settings.';
+        }
+      } catch (error) {
+        console.error('Error loading photos:', error);
+        
+        // Fallback to localStorage if API fails
+        loadPhotosFromLocalStorage();
+      }
+    }
+    
+    // Fallback function for loading photos from localStorage
+    function loadPhotosFromLocalStorage() {
       const photoGallery = document.getElementById('photo-gallery');
       const noPhotosMessage = document.getElementById('no-photos');
       const totalPhotosElement = document.getElementById('total-photos');

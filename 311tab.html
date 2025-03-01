@@ -199,7 +199,7 @@
 
 <body>
   <div class="header">
-    <p>rat reporter</p>
+    <h1 class="app-title">Rat Reporter</h1>
   </div>
   <div class="topnav" id="myTopnav">
     <a href="index.html">Home</a> 
@@ -269,6 +269,12 @@
   </div>
 
   <script>
+    // API URL - change this to your backend URL when deployed
+    const API_URL = 'http://localhost:5000/api';
+    
+    // Current user ID (in a real app, this would come from authentication)
+    const CURRENT_USER_ID = 1;
+    
     // Navigation function
     function myFunction() {
       var x = document.getElementById("myTopnav");
@@ -284,8 +290,55 @@
     const sendButton = document.getElementById('send-button');
     const chatMessages = document.getElementById('chat-messages');
     
-    // Load existing messages from local storage
-    function loadMessages() {
+    // Load existing messages from API
+    async function loadMessages() {
+      try {
+        const response = await fetch(`${API_URL}/chat/messages`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch messages');
+        }
+        
+        const messages = await response.json();
+        
+        // Clear existing messages
+        chatMessages.innerHTML = '';
+        
+        // Display messages
+        messages.forEach(msg => {
+          const messageDiv = document.createElement('div');
+          messageDiv.className = `message ${msg.is_system_message ? 'system' : 'user'}-message`;
+          
+          const contentDiv = document.createElement('div');
+          contentDiv.className = 'message-content';
+          contentDiv.textContent = msg.message;
+          
+          const timeDiv = document.createElement('div');
+          timeDiv.className = 'message-time';
+          
+          // Format timestamp
+          const msgDate = new Date(msg.timestamp);
+          const formattedDate = msgDate.toLocaleDateString() + ' ' + 
+                               msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          
+          timeDiv.textContent = formattedDate;
+          
+          messageDiv.appendChild(contentDiv);
+          messageDiv.appendChild(timeDiv);
+          chatMessages.appendChild(messageDiv);
+        });
+        
+        // Scroll to bottom of chat
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        
+        // Fallback to localStorage if API fails
+        loadMessagesFromLocalStorage();
+      }
+    }
+    
+    // Fallback function for loading messages from localStorage
+    function loadMessagesFromLocalStorage() {
       const savedMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
       
       savedMessages.forEach(msg => {
@@ -310,10 +363,81 @@
     }
     
     // Send a new message
-    function sendMessage() {
+    async function sendMessage() {
       const messageText = messageInput.value.trim();
       if (!messageText) return;
       
+      try {
+        // Send message to API
+        const response = await fetch(`${API_URL}/chat/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: CURRENT_USER_ID,
+            message: messageText
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to send message');
+        }
+        
+        const result = await response.json();
+        
+        // Display user message
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message user-message';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.textContent = messageText;
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = `Today, ${timeString}`;
+        
+        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(timeDiv);
+        chatMessages.appendChild(messageDiv);
+        
+        // Clear input and scroll to bottom
+        messageInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Display system response
+        setTimeout(() => {
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'message system-message';
+          
+          const responseContent = document.createElement('div');
+          responseContent.className = 'message-content';
+          responseContent.textContent = result.system_response.message;
+          
+          const responseTime = document.createElement('div');
+          responseTime.className = 'message-time';
+          responseTime.textContent = `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+          
+          responseDiv.appendChild(responseContent);
+          responseDiv.appendChild(responseTime);
+          chatMessages.appendChild(responseDiv);
+          
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 500);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        
+        // Fallback to localStorage if API fails
+        sendMessageToLocalStorage(messageText);
+      }
+    }
+    
+    // Fallback function for sending message to localStorage
+    function sendMessageToLocalStorage(messageText) {
       const now = new Date();
       const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
@@ -384,29 +508,56 @@
     });
     
     // Report form submission
-    document.getElementById('report-form').addEventListener('submit', function(e) {
+    document.getElementById('report-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       
       const reportType = document.getElementById('report-type').value;
       const location = document.getElementById('location').value;
       const description = document.getElementById('description').value;
       
-      // Save report to local storage
-      const reports = JSON.parse(localStorage.getItem('reports') || '[]');
-      reports.push({
-        type: reportType,
-        location: location,
-        description: description,
-        timestamp: new Date().toISOString(),
-        status: 'Submitted'
-      });
-      localStorage.setItem('reports', JSON.stringify(reports));
-      
-      // Reset form
-      document.getElementById('report-form').reset();
-      
-      // Show confirmation
-      alert('Your report has been submitted. Thank you for helping keep our community clean!');
+      try {
+        // Send report as a chat message
+        const reportMessage = `REPORT: ${reportType} at ${location}. ${description}`;
+        
+        await fetch(`${API_URL}/chat/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: CURRENT_USER_ID,
+            message: reportMessage
+          })
+        });
+        
+        // Reset form
+        document.getElementById('report-form').reset();
+        
+        // Show confirmation
+        alert('Your report has been submitted. Thank you for helping keep our community clean!');
+        
+        // Reload messages to show the new report
+        loadMessages();
+      } catch (error) {
+        console.error('Error submitting report:', error);
+        
+        // Fallback to localStorage if API fails
+        const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+        reports.push({
+          type: reportType,
+          location: location,
+          description: description,
+          timestamp: new Date().toISOString(),
+          status: 'Submitted'
+        });
+        localStorage.setItem('reports', JSON.stringify(reports));
+        
+        // Reset form
+        document.getElementById('report-form').reset();
+        
+        // Show confirmation
+        alert('Your report has been submitted. Thank you for helping keep our community clean!');
+      }
     });
     
     // Load messages when page loads
