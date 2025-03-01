@@ -3,45 +3,55 @@
 <head>
   <title>Rat Killer</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="exp.css"
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="exp.css">
 
 <body>
   <div class="header">
     <p>Rat Killer</p>
   </div>
-<div class="topnav" id="myTopnav">
-  <a href="index.html" class="active"> Home</a> 
-  <a href="311tab.html" class="active">311</a>
-  <a href="history.html" class="active">History</a>
-  <a href="friends.html">Friends</a>
-  <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
-</div>
+  <div class="topnav" id="myTopnav">
+    <a href="index.html" class="active">Home</a> 
+    <a href="311tab.html">311</a>
+    <a href="history.html">History</a>
+    <a href="friends.html">Friends</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+  </div>
 
   <div class="header2">
     <h1>Rat Killer</h1>
   </div>
 
-  
   <div class="row">
     <div class="col-3 col-s-3 menu">
-      <p>Time until garbage truck arrives:</p>
-      <ul>
-        <a href= "https://www.boston.gov/departments/public-works/trash-and-recycling-day-schedule-and-search"><li>Go here!</li></a>
-      </ul>
+      <div class="garbage-timer">
+        <h3>Time until garbage truck arrives:</h3>
+        <p id="garbage-countdown"><span id="hours-remaining">Loading...</span></p>
+        <p class="timer-note">The closer you put trash out to garbage truck coming, the more ELO you gain.</p>
+      </div>
     </div>
   
-    <div class="col-6 col-s-9">
-      <p>insert rank here</p>
+    <div class="col-6 col-s-9 rank-container">
+      <div class="rank-display">
+        <img id="rank-icon" src="rank_icons/Season_2023_-_Silver.png" alt="Rank Icon" class="rank-img">
+        <div class="elo-rating">
+          <h3>ELO Rating</h3>
+          <p id="elo-value">1200</p>
+        </div>
+        <button id="garbage-button" class="action-button">Put Garbage Out</button>
       </div>
+    </div>
 
-      <div class="col-3 col-s-12">
-        <div class="aside">
-          <h1>Rats exterminated:</h1>
-          <p>100000 -- insert value here </p>
-          </div>
-          </div>
+    <div class="col-3 col-s-12">
+      <div class="aside">
+        <h1>Rats exterminated:</h1>
+        <p id="rats-count">100000</p>
+        <div id="chat-popup" class="chat-button">
+          <i class="fa fa-comments"></i> Chat
+        </div>
+      </div>
+    </div>
   </div>
     
   
@@ -50,7 +60,24 @@
 
 
 
+  <!-- Camera Modal -->
+  <div id="camera-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>Take a Photo of Your Garbage</h2>
+      <div class="camera-container">
+        <video id="camera-view" autoplay playsinline></video>
+        <canvas id="camera-canvas" style="display:none;"></canvas>
+      </div>
+      <div class="camera-controls">
+        <button id="camera-capture">Take Photo</button>
+        <button id="photo-save" disabled>Save Photo</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Navigation function
     function myFunction() {
       var x = document.getElementById("myTopnav");
       if (x.className === "topnav") {
@@ -59,13 +86,184 @@
         x.className = "topnav";
       }
     }
-    </script>
+
+    // Calculate time until next Tuesday 1 PM
+    function updateGarbageTimer() {
+      const now = new Date();
+      let nextTuesday = new Date();
+      
+      // Set to next Tuesday
+      nextTuesday.setDate(now.getDate() + ((9 - now.getDay()) % 7));
+      
+      // Set to 1 PM
+      nextTuesday.setHours(13, 0, 0, 0);
+      
+      // If it's already past 1 PM on Tuesday, go to next week
+      if (now > nextTuesday) {
+        nextTuesday.setDate(nextTuesday.getDate() + 7);
+      }
+      
+      // Calculate difference in hours
+      const diffMs = nextTuesday - now;
+      const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      document.getElementById('hours-remaining').textContent = 
+        `${diffHrs} hours, ${diffMins} minutes`;
+    }
+
+    // Initialize garbage timer
+    updateGarbageTimer();
+    // Update every minute
+    setInterval(updateGarbageTimer, 60000);
+
+    // Chat popup functionality
+    document.getElementById('chat-popup').addEventListener('click', function() {
+      window.location.href = '311tab.html';
+    });
+
+    // Camera functionality
+    const cameraModal = document.getElementById('camera-modal');
+    const cameraView = document.getElementById('camera-view');
+    const cameraCanvas = document.getElementById('camera-canvas');
+    const captureButton = document.getElementById('camera-capture');
+    const saveButton = document.getElementById('photo-save');
+    const closeButton = document.querySelector('.close-button');
+    let stream = null;
+
+    // Open camera modal
+    document.getElementById('garbage-button').addEventListener('click', function() {
+      cameraModal.style.display = 'block';
+      startCamera();
+    });
+
+    // Close camera modal
+    closeButton.addEventListener('click', function() {
+      cameraModal.style.display = 'none';
+      stopCamera();
+    });
+
+    // Start camera
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        cameraView.srcObject = stream;
+        saveButton.disabled = true;
+      } catch (err) {
+        console.error("Error accessing camera: ", err);
+        alert("Could not access camera. Please check permissions.");
+      }
+    }
+
+    // Stop camera
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    }
+
+    // Capture photo
+    captureButton.addEventListener('click', function() {
+      const context = cameraCanvas.getContext('2d');
+      cameraCanvas.width = cameraView.videoWidth;
+      cameraCanvas.height = cameraView.videoHeight;
+      context.drawImage(cameraView, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      saveButton.disabled = false;
+    });
+
+    // Save photo
+    saveButton.addEventListener('click', function() {
+      const photoData = cameraCanvas.toDataURL('image/png');
+      
+      // Save to local storage
+      const timestamp = new Date().toISOString();
+      const photos = JSON.parse(localStorage.getItem('garbagePhotos') || '[]');
+      photos.push({
+        id: Date.now(),
+        data: photoData,
+        timestamp: timestamp
+      });
+      localStorage.setItem('garbagePhotos', JSON.stringify(photos));
+      
+      // Update ELO based on timing
+      updateEloForGarbageDisposal();
+      
+      // Close modal
+      cameraModal.style.display = 'none';
+      stopCamera();
+      
+      alert('Photo saved! Check the History tab to view it.');
+    });
+
+    // ELO calculation based on garbage timing
+    function updateEloForGarbageDisposal() {
+      // Get current ELO
+      let currentElo = parseInt(document.getElementById('elo-value').textContent);
+      
+      // Calculate bonus based on timing
+      const now = new Date();
+      let nextTuesday = new Date();
+      nextTuesday.setDate(now.getDate() + ((9 - now.getDay()) % 7));
+      nextTuesday.setHours(13, 0, 0, 0);
+      
+      const hoursUntilPickup = (nextTuesday - now) / (1000 * 60 * 60);
+      
+      // More points for putting garbage out closer to pickup time
+      let eloBonus = 0;
+      if (hoursUntilPickup <= 2) {
+        eloBonus = 50; // Very close to pickup time
+      } else if (hoursUntilPickup <= 12) {
+        eloBonus = 30; // Same day
+      } else if (hoursUntilPickup <= 24) {
+        eloBonus = 15; // Day before
+      } else {
+        eloBonus = 5; // Way too early
+      }
+      
+      // Update ELO
+      currentElo += eloBonus;
+      document.getElementById('elo-value').textContent = currentElo;
+      localStorage.setItem('userElo', currentElo);
+      
+      // Update rank based on new ELO
+      updateRankIcon(currentElo);
+    }
+
+    // Update rank icon based on ELO
+    function updateRankIcon(elo) {
+      let rankIcon = '';
+      
+      if (elo < 800) {
+        rankIcon = 'Season_2023_-_Iron.png';
+      } else if (elo < 1200) {
+        rankIcon = 'Season_2023_-_Silver.png';
+      } else if (elo < 1600) {
+        rankIcon = 'Season_2023_-_Gold.png';
+      } else if (elo < 2000) {
+        rankIcon = 'Season_2023_-_Platinum.png';
+      } else if (elo < 2400) {
+        rankIcon = 'Season_2023_-_Emerald.png';
+      } else if (elo < 2800) {
+        rankIcon = 'Season_2023_-_Challenger.png';
+      } else {
+        rankIcon = 'Season_2023_-_Grandmaster.png';
+      }
+      
+      document.getElementById('rank-icon').src = 'rank_icons/' + rankIcon;
+    }
+
+    // Load saved ELO on page load
+    window.addEventListener('load', function() {
+      const savedElo = localStorage.getItem('userElo');
+      if (savedElo) {
+        document.getElementById('elo-value').textContent = savedElo;
+        updateRankIcon(parseInt(savedElo));
+      }
+    });
+  </script>
     
-    <footer>
-    
-      <p>Rat Killer   <a href="mailto:ondrasek_hanna@wheatoncollege.edu">ondrasek_hanna@wheatoncollege.edu</a>
-      </p>
-      </footer>
-    
-    </body>
-    </html>
+  <footer>
+    <p>Rat Killer <a href="mailto:ondrasek_hanna@wheatoncollege.edu">ondrasek_hanna@wheatoncollege.edu</a></p>
+  </footer>
+</body>
+</html>

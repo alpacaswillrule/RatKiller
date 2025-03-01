@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rat Killer - 311 Tab</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="exp.css">
+  <style>
+    .chat-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .chat-header {
+      background-color: #4a83ff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .chat-messages {
+      height: 400px;
+      padding: 15px;
+      overflow-y: auto;
+      background-color: white;
+    }
+    
+    .message {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+    
+    .user-message {
+      background-color: #e3f2fd;
+      margin-left: auto;
+      border-top-right-radius: 0;
+    }
+    
+    .system-message {
+      background-color: #f1f1f1;
+      margin-right: auto;
+      border-top-left-radius: 0;
+    }
+    
+    .message-time {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+      text-align: right;
+    }
+    
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-top: 1px solid #eee;
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    
+    .chat-input button {
+      background-color: #4a83ff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .chat-input button:hover {
+      background-color: #3a73ef;
+    }
+    
+    .report-section {
+      margin: 30px auto;
+      max-width: 800px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .report-form {
+      display: grid;
+      grid-gap: 15px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-group label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .form-group input, 
+    .form-group textarea, 
+    .form-group select {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+    }
+    
+    .submit-button {
+      background-color: #4a83ff;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    
+    .submit-button:hover {
+      background-color: #3a73ef;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <p>Rat Killer</p>
+  </div>
+  <div class="topnav" id="myTopnav">
+    <a href="index.html">Home</a> 
+    <a href="311tab.html" class="active">311</a>
+    <a href="history.html">History</a>
+    <a href="friends.html">Friends</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+  </div>
+
+  <div class="header2">
+    <h1>311 - Report & Chat</h1>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>Community Chat</h2>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="message system-message">
+        <div class="message-content">Welcome to the Rat Killer community chat! Report rat sightings and discuss with neighbors.</div>
+        <div class="message-time">Today, 10:00 AM</div>
+      </div>
+      <div class="message system-message">
+        <div class="message-content">City services are monitoring this chat. For urgent issues, please use the report form below.</div>
+        <div class="message-time">Today, 10:01 AM</div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="message-input" placeholder="Type your message here...">
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <h2>Report a Problem</h2>
+    <p>Use this form to report rat sightings or garbage issues in your neighborhood.</p>
+    
+    <form class="report-form" id="report-form">
+      <div class="form-group">
+        <label for="report-type">Issue Type</label>
+        <select id="report-type" required>
+          <option value="">Select an issue type</option>
+          <option value="rat-sighting">Rat Sighting</option>
+          <option value="garbage-issue">Garbage Issue</option>
+          <option value="property-damage">Property Damage</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" placeholder="Enter address or intersection" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" placeholder="Describe the issue in detail..." required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="photo-upload">Upload Photo (Optional)</label>
+        <input type="file" id="photo-upload" accept="image/*">
+      </div>
+      
+      <button type="submit" class="submit-button">Submit Report</button>
+    </form>
+  </div>
+
+  <script>
+    // Navigation function
+    function myFunction() {
+      var x = document.getElementById("myTopnav");
+      if (x.className === "topnav") {
+        x.className += " responsive";
+      } else {
+        x.className = "topnav";
+      }
+    }
+
+    // Chat functionality
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const chatMessages = document.getElementById('chat-messages');
+    
+    // Load existing messages from local storage
+    function loadMessages() {
+      const savedMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      
+      savedMessages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${msg.type}-message`;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.textContent = msg.content;
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = msg.time;
+        
+        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(timeDiv);
+        chatMessages.appendChild(messageDiv);
+      });
+      
+      // Scroll to bottom of chat
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Send a new message
+    function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (!messageText) return;
+      
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      // Create message element
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message user-message';
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.textContent = messageText;
+      
+      const timeDiv = document.createElement('div');
+      timeDiv.className = 'message-time';
+      timeDiv.textContent = `Today, ${timeString}`;
+      
+      messageDiv.appendChild(contentDiv);
+      messageDiv.appendChild(timeDiv);
+      chatMessages.appendChild(messageDiv);
+      
+      // Save to local storage
+      const savedMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      savedMessages.push({
+        content: messageText,
+        time: `Today, ${timeString}`,
+        type: 'user'
+      });
+      localStorage.setItem('chatMessages', JSON.stringify(savedMessages));
+      
+      // Clear input and scroll to bottom
+      messageInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Simulate response after a short delay
+      setTimeout(() => {
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'message system-message';
+        
+        const responseContent = document.createElement('div');
+        responseContent.className = 'message-content';
+        responseContent.textContent = 'Thank you for your message. A city representative will respond shortly.';
+        
+        const responseTime = document.createElement('div');
+        responseTime.className = 'message-time';
+        responseTime.textContent = `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        
+        responseDiv.appendChild(responseContent);
+        responseDiv.appendChild(responseTime);
+        chatMessages.appendChild(responseDiv);
+        
+        // Save response to local storage
+        savedMessages.push({
+          content: 'Thank you for your message. A city representative will respond shortly.',
+          time: `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          type: 'system'
+        });
+        localStorage.setItem('chatMessages', JSON.stringify(savedMessages));
+        
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 1000);
+    }
+    
+    // Event listeners
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    
+    // Report form submission
+    document.getElementById('report-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const reportType = document.getElementById('report-type').value;
+      const location = document.getElementById('location').value;
+      const description = document.getElementById('description').value;
+      
+      // Save report to local storage
+      const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+      reports.push({
+        type: reportType,
+        location: location,
+        description: description,
+        timestamp: new Date().toISOString(),
+        status: 'Submitted'
+      });
+      localStorage.setItem('reports', JSON.stringify(reports));
+      
+      // Reset form
+      document.getElementById('report-form').reset();
+      
+      // Show confirmation
+      alert('Your report has been submitted. Thank you for helping keep our community clean!');
+    });
+    
+    // Load messages when page loads
+    window.addEventListener('load', loadMessages);
+  </script>
+    
+  <footer>
+    <p>Rat Killer <a href="mailto:ondrasek_hanna@wheatoncollege.edu">ondrasek_hanna@wheatoncollege.edu</a></p>
+  </footer>
+</body>
+</html>
