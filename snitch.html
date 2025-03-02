@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Garbage Snitch</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="exp.css">
+</head>
+<body>
+  <div class="header">
+    <h1 class="app-title">Rat Reporter</h1>
+  </div>
+  <div class="topnav" id="myTopnav">
+    <a href="index.html">Home</a> 
+    <a href="311tab.html">311</a>
+    <a href="history.html">History</a>
+    <a href="friends.html">Friends</a>
+    <a href="snitch.html" class="active">Snitch</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+  </div>
+
+  <div class="header2">
+    <h1>Garbage Snitch</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-3 col-s-3 menu">
+      <div class="garbage-timer">
+        <h3>Report Sanitary Violations</h3>
+        <p class="timer-note">Report your neighbors for violating city sanitary codes. The more serious the violation, the more ELO you gain.</p>
+        <p class="timer-note">Help keep our city clean by holding others accountable!</p>
+      </div>
+    </div>
+  
+    <div class="col-6 col-s-9 rank-container">
+      <div class="rank-display">
+        <img id="rank-icon" src="rank_icons/Season_2023_-_Silver.png" alt="Rank Icon" class="rank-img">
+        <div class="elo-rating">
+          <h3>ELO Rating</h3>
+          <p id="elo-value">1200</p>
+        </div>
+        <button id="snitch-button" class="action-button">Report Violation</button>
+      </div>
+    </div>
+
+    <div class="col-3 col-s-12">
+      <div class="aside">
+        <h1>Violations Reported:</h1>
+        <p id="violations-count">0</p>
+        
+        <!-- Thermometer for rat mitigation progress -->
+        <div class="thermometer-container">
+          <h3>How Good Are You At Reporting Violations?</h3>
+          <div class="thermometer">
+            <div class="thermometer-fill"></div>
+            <div class="thermometer-markers">
+              <span class="marker europe">Europe</span>
+              <span class="marker boston">Boston</span>
+              <span class="marker newyork">New York</span>
+            </div>
+          </div>
+        </div>
+        
+        <div id="chat-popup" class="chat-button">
+          <i class="fa fa-comments"></i> Chat
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Modal -->
+  <div id="camera-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>Report a Sanitary Violation</h2>
+      <div class="camera-container">
+        <video id="camera-view" autoplay playsinline></video>
+        <canvas id="camera-canvas" style="display:none;"></canvas>
+      </div>
+      
+      <!-- Violation Form -->
+      <div class="violation-form">
+        <div class="form-group">
+          <label for="violation-type">Violation Type:</label>
+          <select id="violation-type" class="form-control">
+            <option value="improper_disposal">Improper Garbage Disposal</option>
+            <option value="unsecured_trash">Unsecured Trash</option>
+            <option value="wrong_day">Wrong Day Placement</option>
+            <option value="no_recycling">No Recycling Separation</option>
+            <option value="overflowing">Overflowing Containers</option>
+            <option value="other">Other Violation</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="violation-comment">Comment:</label>
+          <textarea id="violation-comment" class="form-control" placeholder="Describe the violation..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="violation-location">Location:</label>
+          <input type="text" id="violation-location" class="form-control" placeholder="Enter location...">
+        </div>
+      </div>
+      
+      <div class="camera-controls">
+        <button id="camera-capture">Take Photo</button>
+        <button id="photo-save" disabled>Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ELO Gain Popup -->
+  <div id="elo-popup" class="elo-popup">
+    <div class="elo-popup-content">
+      <span class="elo-close-button">&times;</span>
+      <h2>Violation Reported!</h2>
+      <div class="elo-gain-display">
+        <img src="rank_icons/Season_2023_-_Gold.png" alt="Rank Up" class="elo-rank-img">
+        <div class="elo-points">
+          <h3>ELO Gained</h3>
+          <p id="elo-gained-value">+25</p>
+        </div>
+      </div>
+      <p id="elo-message">Thank you for keeping our city clean!</p>
+    </div>
+  </div>
+
+  <script>
+    // API URL - change this to your backend URL when deployed
+    const API_URL = 'http://localhost:5001/api';
+    
+    // Current user ID (in a real app, this would come from authentication)
+    const CURRENT_USER_ID = 1;
+    
+    // Navigation function
+    function myFunction() {
+      var x = document.getElementById("myTopnav");
+      if (x.className === "topnav") {
+        x.className += " responsive";
+      } else {
+        x.className = "topnav";
+      }
+    }
+
+    // Calculate violations reported based on ELO
+    function calculateViolationsReported(eloRating) {
+      return Math.max(0, Math.floor((eloRating - 1000) / 75));
+    }
+    
+    // Update thermometer fill based on violations reported
+    function updateThermometer(violationsReported) {
+      // Set maximum violations for full thermometer (adjust as needed)
+      const maxViolations = 50;
+      
+      // Calculate fill percentage (capped at 100%)
+      const fillPercentage = Math.min(100, (violationsReported / maxViolations) * 100);
+      
+      // Update thermometer fill height
+      document.querySelector('.thermometer-fill').style.height = `${fillPercentage}%`;
+    }
+    
+    // Fetch user data from API
+    async function loadUserData() {
+      try {
+        const response = await fetch(`${API_URL}/user/${CURRENT_USER_ID}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        
+        const userData = await response.json();
+        const eloRating = userData.elo_rating;
+        
+        // Update ELO display
+        document.getElementById('elo-value').textContent = eloRating;
+        
+        // Calculate and update violations reported
+        const violationsReported = calculateViolationsReported(eloRating);
+        document.getElementById('violations-count').textContent = violationsReported;
+        
+        // Update thermometer
+        updateThermometer(violationsReported);
+        
+        // Update rank icon
+        updateRankIcon(eloRating);
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // Fallback to localStorage if API fails
+        loadUserDataFromLocalStorage();
+      }
+    }
+    
+    // Fallback function for loading user data from localStorage
+    function loadUserDataFromLocalStorage() {
+      const savedElo = localStorage.getItem('userElo') || '1200';
+      const eloRating = parseInt(savedElo);
+      
+      // Update ELO display
+      document.getElementById('elo-value').textContent = savedElo;
+      
+      // Calculate and update violations reported
+      const violationsReported = calculateViolationsReported(eloRating);
+      document.getElementById('violations-count').textContent = violationsReported;
+      
+      // Update thermometer
+      updateThermometer(violationsReported);
+      
+      // Update rank icon
+      updateRankIcon(eloRating);
+    }
+
+    // Chat popup functionality
+    document.getElementById('chat-popup').addEventListener('click', function() {
+      window.location.href = '311tab.html';
+    });
+
+    // Camera functionality
+    const cameraModal = document.getElementById('camera-modal');
+    const cameraView = document.getElementById('camera-view');
+    const cameraCanvas = document.getElementById('camera-canvas');
+    const captureButton = document.getElementById('camera-capture');
+    const saveButton = document.getElementById('photo-save');
+    const closeButton = document.querySelector('.close-button');
+    let stream = null;
+    let capturedPhoto = null;
+
+    // Open camera modal
+    document.getElementById('snitch-button').addEventListener('click', function() {
+      cameraModal.style.display = 'block';
+      startCamera();
+    });
+
+    // Close camera modal
+    closeButton.addEventListener('click', function() {
+      cameraModal.style.display = 'none';
+      stopCamera();
+    });
+
+    // Start camera
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        cameraView.srcObject = stream;
+        saveButton.disabled = true;
+      } catch (err) {
+        console.error("Error accessing camera: ", err);
+        alert("Could not access camera. Please check permissions.");
+      }
+    }
+
+    // Stop camera
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    }
+
+    // Capture photo
+    captureButton.addEventListener('click', function() {
+      const context = cameraCanvas.getContext('2d');
+      cameraCanvas.width = cameraView.videoWidth;
+      cameraCanvas.height = cameraView.videoHeight;
+      context.drawImage(cameraView, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      capturedPhoto = cameraCanvas.toDataURL('image/png');
+      saveButton.disabled = false;
+    });
+
+    // Save photo and violation report
+    saveButton.addEventListener('click', async function() {
+      if (!capturedPhoto) return;
+      
+      // Get form values
+      const violationType = document.getElementById('violation-type').value;
+      const comment = document.getElementById('violation-comment').value;
+      const location = document.getElementById('violation-location').value;
+      
+      try {
+        // First, calculate potential ELO gain
+        const eloResponse = await fetch(`${API_URL}/photos/elo`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            hours_until_pickup: 24, // Default value
+            is_violation_report: true,
+            violation_type: violationType
+          })
+        });
+        
+        const eloData = await eloResponse.json();
+        
+        // Upload photo and violation report to API
+        const uploadResponse = await fetch(`${API_URL}/photos/upload`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: CURRENT_USER_ID,
+            photo: capturedPhoto,
+            is_violation_report: true,
+            violation_type: violationType,
+            comment: comment,
+            location: location
+          })
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload violation report');
+        }
+        
+        const photoData = await uploadResponse.json();
+        
+        // Update user's ELO
+        await fetch(`${API_URL}/user/${CURRENT_USER_ID}/elo`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            elo_change: eloData.elo_gain
+          })
+        });
+        
+        // Reload user data to update UI
+        await loadUserData();
+        
+        // Close modal
+        cameraModal.style.display = 'none';
+        stopCamera();
+        
+        // Show ELO gain popup
+        showEloPopup(eloData.elo_gain, eloData.message);
+      } catch (error) {
+        console.error('Error saving violation report:', error);
+        
+        // Fallback to localStorage if API fails
+        saveViolationToLocalStorage();
+      }
+    });
+    
+    // Fallback function for saving violation to localStorage
+    function saveViolationToLocalStorage() {
+      // Get form values
+      const violationType = document.getElementById('violation-type').value;
+      const comment = document.getElementById('violation-comment').value;
+      const location = document.getElementById('violation-location').value;
+      
+      // Save to local storage
+      const timestamp = new Date().toISOString();
+      const violations = JSON.parse(localStorage.getItem('violationReports') || '[]');
+      violations.push({
+        id: Date.now(),
+        data: capturedPhoto,
+        timestamp: timestamp,
+        violation_type: violationType,
+        comment: comment,
+        location: location
+      });
+      localStorage.setItem('violationReports', JSON.stringify(violations));
+      
+      // Update ELO based on violation type
+      updateEloForViolationReport(violationType);
+      
+      // Close modal
+      cameraModal.style.display = 'none';
+      stopCamera();
+      
+      // Show ELO gain popup
+      const eloGain = getEloGainForViolationType(violationType);
+      showEloPopup(eloGain, "Thank you for reporting this violation!");
+    }
+
+    // ELO calculation based on violation type (fallback function)
+    function updateEloForViolationReport(violationType) {
+      // Get current ELO
+      let currentElo = parseInt(document.getElementById('elo-value').textContent);
+      
+      // Calculate bonus based on violation type
+      const eloBonus = getEloGainForViolationType(violationType);
+      
+      // Update ELO
+      currentElo += eloBonus;
+      document.getElementById('elo-value').textContent = currentElo;
+      localStorage.setItem('userElo', currentElo);
+      
+      // Calculate and update violations reported
+      const violationsReported = calculateViolationsReported(currentElo);
+      document.getElementById('violations-count').textContent = violationsReported;
+      
+      // Update thermometer
+      updateThermometer(violationsReported);
+      
+      // Update rank based on new ELO
+      updateRankIcon(currentElo);
+    }
+
+    // Get ELO gain based on violation type
+    function getEloGainForViolationType(violationType) {
+      switch(violationType) {
+        case 'improper_disposal':
+          return 30;
+        case 'unsecured_trash':
+          return 25;
+        case 'wrong_day':
+          return 35;
+        case 'no_recycling':
+          return 40;
+        case 'overflowing':
+          return 20;
+        case 'other':
+          return 15;
+        default:
+          return 20;
+      }
+    }
+
+    // Show ELO gain popup
+    function showEloPopup(eloGain, message) {
+      const popup = document.getElementById('elo-popup');
+      const eloGainedValue = document.getElementById('elo-gained-value');
+      const eloMessage = document.getElementById('elo-message');
+      const eloCloseButton = document.querySelector('.elo-close-button');
+      
+      // Set values
+      eloGainedValue.textContent = `+${eloGain}`;
+      eloMessage.textContent = message;
+      
+      // Show popup
+      popup.style.display = 'block';
+      
+      // Close popup when clicking the close button
+      eloCloseButton.onclick = function() {
+        popup.style.display = 'none';
+      };
+      
+      // Close popup when clicking outside of it
+      window.onclick = function(event) {
+        if (event.target == popup) {
+          popup.style.display = 'none';
+        }
+      };
+      
+      // Auto-close after 5 seconds
+      setTimeout(function() {
+        popup.style.display = 'none';
+      }, 5000);
+    }
+
+    // Update rank icon based on ELO
+    function updateRankIcon(elo) {
+      let rankIcon = '';
+      
+      if (elo < 800) {
+        rankIcon = 'Season_2023_-_Iron.png';
+      } else if (elo < 1200) {
+        rankIcon = 'Season_2023_-_Silver.png';
+      } else if (elo < 1600) {
+        rankIcon = 'Season_2023_-_Gold.png';
+      } else if (elo < 2000) {
+        rankIcon = 'Season_2023_-_Platinum.png';
+      } else if (elo < 2400) {
+        rankIcon = 'Season_2023_-_Emerald.png';
+      } else if (elo < 2800) {
+        rankIcon = 'Season_2023_-_Challenger.png';
+      } else {
+        rankIcon = 'Season_2023_-_Grandmaster.png';
+      }
+      
+      document.getElementById('rank-icon').src = 'rank_icons/' + rankIcon;
+    }
+
+    // Load user data on page load
+    window.addEventListener('load', function() {
+      loadUserData();
+    });
+  </script>
+  
+  <style>
+    /* Additional styles for the violation form and ELO popup */
+    .violation-form {
+      margin: 20px 0;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 16px;
+    }
+    
+    select.form-control {
+      height: 42px;
+    }
+    
+    textarea.form-control {
+      height: 100px;
+      resize: vertical;
+    }
+    
+    /* ELO Popup Styles */
+    .elo-popup {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .elo-popup-content {
+      background-color: var(--white);
+      margin: 10% auto;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: bounceIn 0.5s ease-out;
+      text-align: center;
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); opacity: 0.9; }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .elo-close-button {
+      color: var(--dark-gray);
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color var(--transition-speed);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .elo-close-button:hover {
+      color: var(--dark-blue);
+      background-color: var(--light-gray);
+    }
+    
+    .elo-gain-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+    
+    .elo-rank-img {
+      max-width: 120px;
+      height: auto;
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    .elo-points {
+      padding: 15px;
+      background-color: var(--light-blue);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      width: 200px;
+    }
+    
+    .elo-points h3 {
+      margin: 0 0 10px 0;
+      color: var(--dark-blue);
+    }
+    
+    #elo-gained-value {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0;
+      color: #27ae60;
+      animation: fadeInUp 1s;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #elo-message {
+      font-size: 18px;
+      color: var(--dark-blue);
+      margin: 20px 0 10px;
+    }
+  </style>
+    
+  <footer>
+    <p>rat reporter</p>
+    <div class="footer-links">
+      <a href="https://www.boston.gov/" class="footer-button" target="_blank">Boston.gov</a>
+      <a href="https://www.boston.gov/departments/inspectional-services/boston-rodent-action-plan" class="footer-button" target="_blank">Rodent Action Plan</a>
+      <a href="https://www.nrdc.org/stories/composting-101" class="footer-button" target="_blank">Composting 101</a>
+    </div>
+  </footer>
+</body>
+</html>

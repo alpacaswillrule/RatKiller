@@ -204,6 +204,53 @@
       transform: translateY(1px);
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
+    /* Violation report styles */
+    .violation-card {
+      border: 2px solid #e74c3c;
+    }
+    
+    .photo-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      color: white;
+      z-index: 10;
+    }
+    
+    .violation-card .photo-badge {
+      background-color: #e74c3c;
+    }
+    
+    .photo-card:not(.violation-card) .photo-badge {
+      background-color: var(--medium-blue);
+    }
+    
+    .photo-card {
+      position: relative;
+    }
+    
+    .violation-info {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+      font-size: 13px;
+    }
+    
+    .violation-type {
+      font-weight: bold;
+      color: #e74c3c;
+      margin-bottom: 3px;
+    }
+    
+    .violation-location, .violation-comment {
+      margin-bottom: 3px;
+      color: #666;
+    }
   </style>
 </head>
 
@@ -216,6 +263,7 @@
     <a href="311tab.html">311</a>
     <a href="history.html" class="active">History</a>
     <a href="friends.html">Friends</a>
+    <a href="snitch.html">Snitch</a>
     <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
   </div>
 
@@ -226,7 +274,7 @@
   <div class="history-container">
     <div class="history-header">
       <h2>Your Garbage Disposal History</h2>
-      <p>View your past garbage disposal activities and track your contribution to keeping the community clean.</p>
+      <p>View your past garbage disposal activities and violation reports to track your contribution to keeping the community clean.</p>
     </div>
     
     <button id="create-photos-folder" class="create-folder-btn">
@@ -269,6 +317,15 @@
           <option value="week">Past Week</option>
           <option value="month">Past Month</option>
           <option value="year">Past Year</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="type-filter">Type:</label>
+        <select id="type-filter">
+          <option value="all">All Photos</option>
+          <option value="disposal">Garbage Disposal</option>
+          <option value="violation">Violation Reports</option>
         </select>
       </div>
     </div>
@@ -403,16 +460,37 @@
           const photoCard = document.createElement('div');
           photoCard.className = 'photo-card';
           
+          if (photo.is_violation_report) {
+            photoCard.classList.add('violation-card');
+          }
+          
           // Use the photo path from the API or fallback to localStorage
           const photoSrc = photo.photo_path ? 
             `${API_URL}/photos/${photo.photo_path.split('/').pop()}` : 
             (photo.data || 'https://via.placeholder.com/300x200?text=Photo+Not+Found');
           
+          let photoInfo = `
+            <div class="photo-date">${formattedDate}</div>
+            <div class="photo-elo">+${photo.elo_gained} ELO gained</div>
+          `;
+          
+          // Add violation details if applicable
+          if (photo.is_violation_report) {
+            const violationType = formatViolationType(photo.violation_type || 'other');
+            photoInfo += `
+              <div class="violation-info">
+                <div class="violation-type">Type: ${violationType}</div>
+                ${photo.location ? `<div class="violation-location">Location: ${photo.location}</div>` : ''}
+                ${photo.comment ? `<div class="violation-comment">Comment: ${photo.comment}</div>` : ''}
+              </div>
+            `;
+          }
+          
           photoCard.innerHTML = `
-            <img src="${photoSrc}" alt="Garbage photo" class="photo-image">
+            <div class="photo-badge">${photo.is_violation_report ? 'Violation Report' : 'Garbage Disposal'}</div>
+            <img src="${photoSrc}" alt="${photo.is_violation_report ? 'Violation' : 'Garbage'} photo" class="photo-image">
             <div class="photo-info">
-              <div class="photo-date">${formattedDate}</div>
-              <div class="photo-elo">+${photo.elo_gained} ELO gained</div>
+              ${photoInfo}
             </div>
           `;
           
@@ -486,28 +564,39 @@
           break;
       }
       
-      // Filter photos based on time period
-      const timeFilter = document.getElementById('time-filter').value;
-      let filteredPhotos = sortedPhotos;
-      
-      if (timeFilter !== 'all') {
-        const now = new Date();
-        let cutoffDate;
+        // Apply time filter
+        const timeFilter = document.getElementById('time-filter').value;
+        let filteredPhotos = sortedPhotos;
         
-        switch (timeFilter) {
-          case 'week':
-            cutoffDate = new Date(now.setDate(now.getDate() - 7));
-            break;
-          case 'month':
-            cutoffDate = new Date(now.setMonth(now.getMonth() - 1));
-            break;
-          case 'year':
-            cutoffDate = new Date(now.setFullYear(now.getFullYear() - 1));
-            break;
+        if (timeFilter !== 'all') {
+          const now = new Date();
+          let cutoffDate;
+          
+          switch (timeFilter) {
+            case 'week':
+              cutoffDate = new Date(now.setDate(now.getDate() - 7));
+              break;
+            case 'month':
+              cutoffDate = new Date(now.setMonth(now.getMonth() - 1));
+              break;
+            case 'year':
+              cutoffDate = new Date(now.setFullYear(now.getFullYear() - 1));
+              break;
+          }
+          
+          filteredPhotos = sortedPhotos.filter(photo => new Date(photo.timestamp) >= cutoffDate);
         }
         
-        filteredPhotos = sortedPhotos.filter(photo => new Date(photo.timestamp) >= cutoffDate);
-      }
+        // Apply type filter
+        const typeFilter = document.getElementById('type-filter').value;
+        
+        if (typeFilter !== 'all') {
+          if (typeFilter === 'disposal') {
+            filteredPhotos = filteredPhotos.filter(photo => !photo.is_violation_report);
+          } else if (typeFilter === 'violation') {
+            filteredPhotos = filteredPhotos.filter(photo => photo.is_violation_report);
+          }
+        }
       
       // Display photos
       filteredPhotos.forEach(photo => {
@@ -542,9 +631,28 @@
       }
     }
     
+    // Format violation type for display
+    function formatViolationType(type) {
+      switch(type) {
+        case 'improper_disposal':
+          return 'Improper Disposal';
+        case 'unsecured_trash':
+          return 'Unsecured Trash';
+        case 'wrong_day':
+          return 'Wrong Day Placement';
+        case 'no_recycling':
+          return 'No Recycling Separation';
+        case 'overflowing':
+          return 'Overflowing Containers';
+        default:
+          return 'Other Violation';
+      }
+    }
+    
     // Event listeners for filters
     document.getElementById('sort-by').addEventListener('change', loadPhotos);
     document.getElementById('time-filter').addEventListener('change', loadPhotos);
+    document.getElementById('type-filter').addEventListener('change', loadPhotos);
     
     // Load photos when page loads
     window.addEventListener('load', loadPhotos);
