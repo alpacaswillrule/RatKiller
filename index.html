@@ -117,7 +117,18 @@
       </div>
       <div id="detection-results">
         <div id="detection-status" class="detection-status"></div>
-        <div id="detection-items" class="detection-items"></div>
+        <div class="detection-tabs">
+          <button class="tab-button active" data-tab="trash-tab">Trash Items</button>
+          <button class="tab-button" data-tab="all-tab">All Detections</button>
+        </div>
+        <div id="trash-tab" class="tab-content active">
+          <h3>Trash Items</h3>
+          <div id="trash-items" class="detection-items"></div>
+        </div>
+        <div id="all-tab" class="tab-content">
+          <h3>All Detected Objects</h3>
+          <div id="all-items" class="detection-items"></div>
+        </div>
       </div>
       <div class="detection-controls">
         <button id="detection-confirm">Confirm & Save</button>
@@ -168,8 +179,47 @@
       border: 1px solid #f5c6cb;
     }
     
+    .detection-tabs {
+      display: flex;
+      margin: 15px 0 5px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab-button {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      padding: 8px 16px;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    
+    .tab-button.active {
+      background-color: var(--light-blue);
+      border-color: var(--dark-blue);
+      color: var(--dark-blue);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 10px 0;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .tab-content h3 {
+      margin: 0 0 10px 0;
+      color: var(--dark-blue);
+      font-size: 16px;
+    }
+    
     .detection-items {
-      margin: 15px 0;
+      margin: 5px 0 15px;
       max-height: 150px;
       overflow-y: auto;
     }
@@ -183,6 +233,15 @@
       background-color: #f8f9fa;
       border-radius: 4px;
       border-left: 4px solid var(--dark-blue);
+    }
+    
+    .detection-item.is-trash {
+      border-left: 4px solid #28a745;
+      background-color: #f0fff0;
+    }
+    
+    .detection-item.not-trash {
+      border-left: 4px solid #6c757d;
     }
     
     .detection-item-name {
@@ -618,17 +677,21 @@
       const detectionModal = document.getElementById('detection-modal');
       const detectionImage = document.getElementById('detection-image');
       const detectionStatus = document.getElementById('detection-status');
-      const detectionItems = document.getElementById('detection-items');
+      const trashItems = document.getElementById('trash-items');
+      const allItems = document.getElementById('all-items');
       const detectionConfirm = document.getElementById('detection-confirm');
       const detectionTitle = document.getElementById('detection-title');
       const detectionClose = document.querySelector('.detection-close');
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
       
       // Set image source (use annotated image if available, otherwise original)
       detectionImage.src = detectionData.annotated_image || originalPhoto;
       
       // Clear previous results
       detectionStatus.className = 'detection-status';
-      detectionItems.innerHTML = '';
+      trashItems.innerHTML = '';
+      allItems.innerHTML = '';
       
       // Set status message
       if (detectionData.has_trash) {
@@ -641,11 +704,11 @@
         detectionTitle.textContent = 'No Trash Detected';
       }
       
-      // Add detection items
-      if (detectionData.detections && detectionData.detections.length > 0) {
-        detectionData.detections.forEach(detection => {
+      // Add trash detection items
+      if (detectionData.trash_detections && detectionData.trash_detections.length > 0) {
+        detectionData.trash_detections.forEach(detection => {
           const item = document.createElement('div');
-          item.className = 'detection-item';
+          item.className = 'detection-item is-trash';
           
           const name = document.createElement('span');
           name.className = 'detection-item-name';
@@ -657,15 +720,59 @@
           
           item.appendChild(name);
           item.appendChild(confidence);
-          detectionItems.appendChild(item);
+          trashItems.appendChild(item);
         });
       } else if (detectionData.has_trash) {
         // If has_trash is true but no detections array
         const item = document.createElement('div');
-        item.className = 'detection-item';
+        item.className = 'detection-item is-trash';
         item.textContent = 'Trash detected';
-        detectionItems.appendChild(item);
+        trashItems.appendChild(item);
+      } else {
+        const item = document.createElement('div');
+        item.className = 'detection-item';
+        item.textContent = 'No trash items detected';
+        trashItems.appendChild(item);
       }
+      
+      // Add all detection items
+      if (detectionData.all_detections && detectionData.all_detections.length > 0) {
+        detectionData.all_detections.forEach(detection => {
+          const item = document.createElement('div');
+          item.className = detection.is_trash ? 
+            'detection-item is-trash' : 'detection-item not-trash';
+          
+          const name = document.createElement('span');
+          name.className = 'detection-item-name';
+          name.textContent = detection.class + (detection.is_trash ? ' (Trash)' : '');
+          
+          const confidence = document.createElement('span');
+          confidence.className = 'detection-item-confidence';
+          confidence.textContent = `${Math.round(detection.confidence * 100)}%`;
+          
+          item.appendChild(name);
+          item.appendChild(confidence);
+          allItems.appendChild(item);
+        });
+      } else {
+        const item = document.createElement('div');
+        item.className = 'detection-item';
+        item.textContent = 'No objects detected';
+        allItems.appendChild(item);
+      }
+      
+      // Set up tab switching
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all buttons and contents
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          // Add active class to clicked button and corresponding content
+          this.classList.add('active');
+          document.getElementById(this.dataset.tab).classList.add('active');
+        });
+      });
       
       // Show modal
       detectionModal.style.display = 'block';

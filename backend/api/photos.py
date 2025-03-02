@@ -24,10 +24,11 @@ def get_model():
             # Use models directory to store the model
             models_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models')
             os.makedirs(models_dir, exist_ok=True)
-            model_path = os.path.join(models_dir, 'yolov8x.pt')
+            model_path = os.path.join(models_dir, 'yolov8n.pt')  # Using smaller model for faster download
             
             # Initialize the model (it will download if not present)
             model = YOLO(model_path)
+            print(f"YOLOv8 model loaded successfully from {model_path}")
         except Exception as e:
             print(f"Error loading YOLOv8 model: {e}")
     return model
@@ -48,28 +49,38 @@ TRASH_CLASSES = ['bottle', 'cup', 'wine glass', 'fork', 'knife', 'spoon',
 def detect_trash(image_path):
     """
     Detect trash in an image using YOLOv8.
-    Returns a tuple of (has_trash, detections, annotated_image)
+    Returns a tuple of (has_trash, detections, all_detections, annotated_image)
     """
     try:
         model = get_model()
         if model is None:
-            return False, [], None
+            return False, [], [], None
         
         # Run inference
         results = model(image_path)
         
-        # Get detections
-        detections = []
+        # Get all detections
+        all_detections = []
+        trash_detections = []
+        
         for result in results:
             for box in result.boxes:
                 class_id = int(box.cls[0].item())
                 class_name = result.names[class_id]
+                confidence = box.conf[0].item()
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                
+                # Add to all detections
+                all_detections.append({
+                    'class': class_name,
+                    'confidence': confidence,
+                    'bbox': [x1, y1, x2, y2],
+                    'is_trash': class_name in TRASH_CLASSES
+                })
                 
                 # Check if the detected object is trash-related
                 if class_name in TRASH_CLASSES:
-                    confidence = box.conf[0].item()
-                    x1, y1, x2, y2 = box.xyxy[0].tolist()
-                    detections.append({
+                    trash_detections.append({
                         'class': class_name,
                         'confidence': confidence,
                         'bbox': [x1, y1, x2, y2]
@@ -79,12 +90,12 @@ def detect_trash(image_path):
         annotated_image = results[0].plot() if results else None
         
         # Return results
-        has_trash = len(detections) > 0
-        return has_trash, detections, annotated_image
+        has_trash = len(trash_detections) > 0
+        return has_trash, trash_detections, all_detections, annotated_image
     
     except Exception as e:
         print(f"Error detecting trash: {e}")
-        return False, [], None
+        return False, [], [], None
 
 def get_next_tuesday_2pm():
     """Get the datetime of the next Tuesday at 2:00 PM."""
@@ -175,7 +186,7 @@ def calculate_elo_gain(is_violation_report=False, violation_type=None, photo_pat
     For violation reports, verify trash presence first, then apply violation bonuses.
     """
     # First, detect if there's trash in the image
-    has_trash, detections, _ = detect_trash(photo_path) if photo_path else (False, [], None)
+    has_trash, trash_detections, _, _ = detect_trash(photo_path) if photo_path else (False, [], [], None)
     
     if not has_trash:
         # No trash detected, return zero ELO
@@ -327,7 +338,7 @@ def calculate_photo_elo():
             print(f"Error processing photo data: {e}")
     
     # Detect trash in the image
-    has_trash, detections, _ = detect_trash(photo_path) if photo_path else (False, [], None)
+    has_trash, trash_detections, all_detections, _ = detect_trash(photo_path) if photo_path else (False, [], [], None)
     
     # Clean up temporary file
     if photo_path and os.path.exists(photo_path):
@@ -424,7 +435,7 @@ def detect_trash_endpoint():
                 f.write(binary_data)
             
             # Detect trash
-            has_trash, detections, annotated_image = detect_trash(photo_path)
+            has_trash, trash_detections, all_detections, annotated_image = detect_trash(photo_path)
             
             # Convert annotated image to base64 if available
             annotated_image_base64 = None
@@ -445,7 +456,8 @@ def detect_trash_endpoint():
             
             return jsonify({
                 'has_trash': has_trash,
-                'detections': detections,
+                'trash_detections': trash_detections,
+                'all_detections': all_detections,
                 'annotated_image': annotated_image_base64
             })
         else:
