@@ -47,6 +47,20 @@
       <div class="aside">
         <h1>Rats Mitigated:</h1>
         <p id="rats-count">100000</p>
+        
+        <!-- Thermometer for rat mitigation progress -->
+        <div class="thermometer-container">
+          <h3>How Good Are You At Mitigating Rats?</h3>
+          <div class="thermometer">
+            <div class="thermometer-fill"></div>
+            <div class="thermometer-markers">
+              <span class="marker europe">Europe</span>
+              <span class="marker boston">Boston</span>
+              <span class="marker newyork">New York</span>
+            </div>
+          </div>
+        </div>
+        
         <div id="chat-popup" class="chat-button">
           <i class="fa fa-comments"></i> Chat
         </div>
@@ -147,6 +161,23 @@
     // Update every minute
     setInterval(updateGarbageTimer, 60000);
 
+    // Calculate rats mitigated based on ELO
+    function calculateRatsMitigated(eloRating) {
+      return Math.max(0, Math.floor((eloRating - 1000) / 50));
+    }
+    
+    // Update thermometer fill based on rats mitigated
+    function updateThermometer(ratsMitigated) {
+      // Set maximum rats for full thermometer (adjust as needed)
+      const maxRats = 100;
+      
+      // Calculate fill percentage (capped at 100%)
+      const fillPercentage = Math.min(100, (ratsMitigated / maxRats) * 100);
+      
+      // Update thermometer fill height
+      document.querySelector('.thermometer-fill').style.height = `${fillPercentage}%`;
+    }
+    
     // Fetch user data from API
     async function loadUserData() {
       try {
@@ -156,13 +187,20 @@
         }
         
         const userData = await response.json();
+        const eloRating = userData.elo_rating;
         
-        // Update UI with user data
-        document.getElementById('elo-value').textContent = userData.elo_rating;
-        document.getElementById('rats-count').textContent = userData.disposals_count;
+        // Update ELO display
+        document.getElementById('elo-value').textContent = eloRating;
+        
+        // Calculate and update rats mitigated
+        const ratsMitigated = calculateRatsMitigated(eloRating);
+        document.getElementById('rats-count').textContent = ratsMitigated;
+        
+        // Update thermometer
+        updateThermometer(ratsMitigated);
         
         // Update rank icon
-        updateRankIcon(userData.elo_rating);
+        updateRankIcon(eloRating);
       } catch (error) {
         console.error('Error loading user data:', error);
         // Fallback to localStorage if API fails
@@ -173,8 +211,20 @@
     // Fallback function for loading user data from localStorage
     function loadUserDataFromLocalStorage() {
       const savedElo = localStorage.getItem('userElo') || '1200';
+      const eloRating = parseInt(savedElo);
+      
+      // Update ELO display
       document.getElementById('elo-value').textContent = savedElo;
-      updateRankIcon(parseInt(savedElo));
+      
+      // Calculate and update rats mitigated
+      const ratsMitigated = calculateRatsMitigated(eloRating);
+      document.getElementById('rats-count').textContent = ratsMitigated;
+      
+      // Update thermometer
+      updateThermometer(ratsMitigated);
+      
+      // Update rank icon
+      updateRankIcon(eloRating);
     }
 
     // Chat popup functionality
@@ -343,6 +393,13 @@
       currentElo += eloBonus;
       document.getElementById('elo-value').textContent = currentElo;
       localStorage.setItem('userElo', currentElo);
+      
+      // Calculate and update rats mitigated
+      const ratsMitigated = calculateRatsMitigated(currentElo);
+      document.getElementById('rats-count').textContent = ratsMitigated;
+      
+      // Update thermometer
+      updateThermometer(ratsMitigated);
       
       // Update rank based on new ELO
       updateRankIcon(currentElo);

@@ -706,3 +706,90 @@ body, html {
   transform: none !important;
   box-shadow: none !important;
 }
+
+/* Thermometer Styles */
+.thermometer-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  height: 250px;
+  position: relative;
+  text-align: center;
+}
+
+.thermometer-container h3 {
+  color: var(--white);
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.thermometer {
+  width: 40px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.thermometer-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%; /* Will be set by JavaScript */
+  background: linear-gradient(to top, 
+    #ff4d4d 0%, /* New York - Red */
+    #ff4d4d 33.33%,
+    #ffd700 33.33%, /* Boston - Gold */
+    #ffd700 66.66%,
+    #4CAF50 66.66%, /* Europe - Green */
+    #4CAF50 100%
+  );
+  transition: height 1s ease-in-out;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.thermometer-markers {
+  position: absolute;
+  right: -80px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.marker {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.marker.europe { 
+  color: #4CAF50; 
+  margin-top: 10px;
+}
+
+.marker.boston { 
+  color: #ffd700; 
+}
+
+.marker.newyork { 
+  color: #ff4d4d;
+  margin-bottom: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .thermometer-markers {
+    right: -60px;
+  }
+  
+  .marker {
+    font-size: 12px;
+  }
+}
